@@ -334,21 +334,39 @@ const getMe = async (req, res) => {
 };
 
 const requestOTP = async (req, res) => {
-  const { email } = req.body
+  console.log("BODY:", req.body);
+
+  const { email } = req.body;
+
   try {
-    const isUser = await UserModel.findOne({ email })
+    const isUser = await UserModel.findOne({ email });
+    console.log("USER:", isUser);
 
     if (!isUser) {
-      res.status(404).send({
+      return res.status(404).send({
         message: "Account not found"
       });
-      return;
     }
 
-    const sendOTP = otpgen.generate(4, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false, digits: true })
-    const user = await OTPModel.create({ email, otp: sendOTP })
+    const sendOTP = otpgen.generate(4, {
+      upperCaseAlphabets: false,
+      specialChars: false,
+      lowerCaseAlphabets: false,
+      digits: true
+    });
 
-    const otpMailContent = await mailSender('otpMail.ejs', { otp: sendOTP, firstName: isUser.firstName })
+    console.log("OTP:", sendOTP);
+
+    await OTPModel.create({ email, otp: sendOTP });
+
+    console.log("OTP saved");
+
+    const otpMailContent = await mailSender('otpMail.ejs', {
+      otp: sendOTP,
+      firstName: isUser.firstName
+    });
+
+    console.log("Mail content ready");
 
     let mailOptions = {
       from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
@@ -359,7 +377,7 @@ const requestOTP = async (req, res) => {
 
     transporter.sendMail(mailOptions, function(error, info) {
       if (error) {
-        console.log(error);
+        console.log("MAIL ERROR:", error);
       } else {
         console.log('Email sent: ' + info.response);
       }
@@ -367,15 +385,16 @@ const requestOTP = async (req, res) => {
 
     res.status(200).send({
       message: "Otp sent successfully",
-    })
+    });
 
   } catch (error) {
-    console.log(error);
+    console.log("OTP ERROR:", error);
     res.status(400).send({
       message: "Otp request failed",
-    })
+      error: error.message
+    });
   }
-}
+};
 
 const forgotPassword = async (req, res) => {
   const { otp, email, newPassword } = req.body
