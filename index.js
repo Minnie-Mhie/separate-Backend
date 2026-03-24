@@ -155,13 +155,13 @@ app.post("/editProd/:id", (req, res)=>{
 })
 
 
-// app.listen(process.env.PORT, (err) => {
-//   if (err) {
-//     console.log("error starting server", err);
-//   } else {
-//     console.log(`server started successfully`);
-//   }
-// });
+app.listen(process.env.VITE_API_URL, (err) => {
+  if (err) {
+    console.log("error starting server", err);
+  } else {
+    console.log(`server started successfully`);
+  }
+});
 
 module.exports = app;
 module.exports.handler = serverless(app);
