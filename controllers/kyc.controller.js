@@ -1,9 +1,9 @@
 const ActivityModel = require("../models/activity.model")
 const UserModel = require("../models/user.model")
-const nodemailer = require("nodemailer") // ✅ fixed: was missing
-const mailSender = require("../middlewares/mailer") // ✅ fixed: was missing
+const nodemailer = require("nodemailer") 
+const mailSender = require("../middlewares/mailer")
 
-let transporter = nodemailer.createTransport({ // ✅ fixed: was missing
+let transporter = nodemailer.createTransport({ 
   service: 'gmail',
   auth: {
     user: process.env.NODE_MAIL,
@@ -100,7 +100,7 @@ const suspendUser = async (req, res) => {
 
     const renderMail = await mailSender("suspendAccount.ejs", {
       firstName: user.firstName,
-      email: user.email, // ✅ fixed: was missing email
+      email: user.email,
     })
 
     let mailOptions = {

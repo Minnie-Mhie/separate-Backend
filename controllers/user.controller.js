@@ -248,11 +248,9 @@ const deleteUser = async (req, res) => {
       message: "user deleted successfully",
     });
 
-    // ✅ fixed: now uses isDeleted directly (the deleted user's data)
-    // instead of fetching req.user.id which returns the admin
-    const renderMail = await mailSender("deleteAccount.ejs", { // ✅ fixed: was "deleteUser.ejs"
+    const renderMail = await mailSender("deleteAccount.ejs", { 
       firstName: isDeleted.firstName,
-      email: isDeleted.email, // ✅ fixed: was missing email
+      email: isDeleted.email, 
     })
 
     let mailOptions = {
