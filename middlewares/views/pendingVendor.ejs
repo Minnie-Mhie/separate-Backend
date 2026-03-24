@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: rgb(250, 94, 224);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .footer {
+            background-color: rgb(250, 94, 224);
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+           <h1>
+             Hello <%= firstName %>!
+           </h1>
+        </div>
+        <div class="content">
+        <hr>
+        <h2>Vendor Application Status</h2>
+        <p>Thank you for submitting your vendor application to Nana's Pourfection Hub!</p>
+        <p>We have received your application and it is currently under review by our admin team.</p>
+        <p><strong>Status:</strong> Pending Approval</p>
+        <p>We will notify you via email as soon as your application has been reviewed. This typically takes 0-2 business days.</p>
+        <p>If you have any questions, please don't hesitate to contact our support team.</p>
+        </div>
+        <div class="footer">
+            <p>
+                This email was sent by Nana's Pourfection Hub &copy; <%= new Date().getFullYear() %>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

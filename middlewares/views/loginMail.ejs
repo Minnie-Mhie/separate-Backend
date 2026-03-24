@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: rgb(1, 1, 109);
+            color: #dec1ff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+            /* background-color: #dec1ff !important; */
+            color: #dec1ff;
+            
+        }
+
+        .footer {
+            background-color: rgb(1, 1, 109);
+            color: #dec1ff;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Hello, <%= firstName %>!</h1>
+        </div>
+
+        <div class="content">
+            <p>Welcome to Nana's Pourfection Hub!</p>
+            <p>You have successfully logged in to your account.</p>
+            <p>If you did not authorize this login, please contact our support team immediately.</p>
+            <p>Best regards,<br>The Nana's Pourfection Hub Team</p>
+        </div>
+
+          <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Nana's Pourfection Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+
+</html>

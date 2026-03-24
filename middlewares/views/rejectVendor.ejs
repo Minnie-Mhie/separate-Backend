@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Application Rejected</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        .reason {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-left: 4px solid #dc3545;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+            background-color: #f9f9f9;
+            border-radius: 0 0 5px 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Application Status</h1>
+        </div>
+        <div class="content">
+            <p>Dear <%= firstName %>,</p>
+            
+            <p>Thank you for your interest in becoming a vendor with us. We appreciate the time and effort you invested in your application.</p>
+            
+            <p>Unfortunately, we regret to inform you that your vendor application has been <strong>rejected</strong>.</p>
+            
+            <p>If you have any questions or would like more feedback on your application, please feel free to contact our support team.</p>
+            
+            <p>We encourage you to apply again in the future.</p>
+            
+            <p>Best regards,<br>
+            The Management Team</p>
+        </div>
+         <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Nana's Pourfection Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

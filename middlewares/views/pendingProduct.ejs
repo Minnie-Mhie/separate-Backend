@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: rgb(252, 137, 233); color: rgb(1, 1, 109); }
+        .product-box { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 15px 20px; border-radius: 8px; margin: 16px 0; text-align: center; }
+        .product-box h2 { margin: 0; font-size: 20px; }
+        .product-box p { margin: 6px 0 0; font-size: 13px; opacity: 0.8; }
+        .footer { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 10px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Product Received!</h1>
+            <p>Hello, <%= firstName %>!</p>
+        </div>
+        <div class="content">
+            <p>Welcome to Nana's Pourfection Hub!</p>
+            <p>Your product has been successfully submitted and is currently <strong>pending review</strong> by our admin team. We will notify you once a decision has been made.</p>
+
+            <div class="product-box">
+                <h2><%= productName %></h2>
+                <p>⏳ Awaiting Admin Review</p>
+            </div>
+
+            <p>This usually takes 24 to 48 hours. Thank you for your patience.</p>
+            <p>Best regards,<br>The Nana's Pourfection Hub Team</p>
+        </div>
+       <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Nana's Pourfection Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

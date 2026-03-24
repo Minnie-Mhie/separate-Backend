@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+                       body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: rgb(1, 1, 109);
+            color: #dec1ff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+            /* background-color: #dec1ff !important; */
+            color: #dec1ff;
+            
+        }
+
+        .footer {
+            background-color: rgb(1, 1, 109);
+            color: #dec1ff;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .notice-box { background-color: rgb(1, 1, 109); color: #dec1ff; border-radius: 8px; margin: 16px 0; text-align: center; }
+        .notice-box h2 { margin: 0; font-size: 18px; }
+        .notice-box p { margin: 6px 0 0; font-size: 13px; opacity: 0.8; }
+   
+    </style>
+</head>
+<body>
+        <div class="container">
+        <div class="header">
+            <h1>Account Deleted</h1>
+            <p>Hello, <%= firstName %>!</p>
+        </div>
+        <div class="content">
+            <p>We are writing to inform you that your account on Nana's Pourfection Hub has been permanently <strong>deleted</strong> by an administrator.</p>
+
+            <div class="notice-box">
+                <h2><%= email %></h2>
+                <p>✗ Account Permanently Deleted</p>
+            </div>
+
+            <p>Your profile, order history and all associated data have been removed from our platform. This action cannot be undone.</p>
+            <p>If you believe this was done in error, please contact our support team as soon as possible.</p>
+            <p>Thank you for being a part of our community.</p>
+            <p>Best regards,<br>The Nana's Pourfection Hub Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Nana's Pourfection Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

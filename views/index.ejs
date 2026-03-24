@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body>
+    
+
+    <h1>Hello, this is my first ejs</h1>
+
+    
+
+<div class="d-flex flex-wrap gap-3">
+    <% products.forEach((product, index) => { %>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title"><%= product.prodName %></h5>
+              <h6 class="card-subtitle mb-2 text-body-secondary"><%= product.prodPrice %></h6>
+              <p class="card-text"><%= product.prodDescription %></p>
+              
+            <div class="d-flex gap-3">
+               <form action="/editProd/<%= index %>" method="get">
+                <button class="btn btn-dark">Edit</button>
+               </form>
+               <form action="/deleteProd/<%= index %>" method="post">
+                <button class="btn btn-danger">Delete</button>
+               </form>
+            </div>
+            </div>
+          </div>
+    <% }) %>
+        
+</div>
+
+
+<a href="/addProduct" class="btn btn-dark">Go To Add Product</a>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+     
+</body>
+</html>

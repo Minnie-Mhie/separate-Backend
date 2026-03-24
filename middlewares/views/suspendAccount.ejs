@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: rgb(252, 137, 233); color: rgb(1, 1, 109); }
+        .notice-box { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 15px 20px; border-radius: 8px; margin: 16px 0; text-align: center; }
+        .notice-box h2 { margin: 0; font-size: 18px; }
+        .notice-box p { margin: 6px 0 0; font-size: 13px; opacity: 0.8; }
+        .footer { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 10px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Account Suspended</h1>
+            <p>Hello, <%= firstName %>!</p>
+        </div>
+        <div class="content">
+            <p>We are writing to inform you that your account on Nana's Pourfection Hub has been <strong>suspended</strong> by an administrator.</p>
+
+            <div class="notice-box">
+                <h2><%= email %></h2>
+                <p>⚠ Account Suspended</p>
+            </div>
+
+            <p>While your account is suspended you will not be able to log in or access any features on the platform.</p>
+            <p>If you believe this was done in error or would like to appeal this decision, please contact our support team as soon as possible.</p>
+            <p>Best regards,<br>The Nana's Pourfection Hub Team</p>
+        </div>
+       <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Nana's Pourfection Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

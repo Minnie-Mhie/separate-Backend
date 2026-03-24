@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: rgb(252, 137, 233); color: rgb(1, 1, 109); }
+        .order-box { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 15px 20px; border-radius: 8px; margin: 16px 0; }
+        .order-box h2 { margin: 0 0 12px; font-size: 16px; text-align: center; }
+        .order-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid rgba(250,94,224,0.3); }
+        .order-row:last-child { border-bottom: none; font-weight: bold; font-size: 15px; }
+        .customer-box { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 15px 20px; border-radius: 8px; margin: 16px 0; }
+        .customer-box h2 { margin: 0 0 10px; font-size: 16px; }
+        .customer-box p { margin: 4px 0; font-size: 14px; opacity: 0.85; }
+        .footer { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 10px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Order Received! 🛍️</h1>
+            <p>Hello, <%= firstName %>!</p>
+        </div>
+        <div class="content">
+            <p>Great news! You have received a new order on Nana's Pourfection Hub. Please process it as soon as possible.</p>
+
+            <div class="order-box">
+                <h2>Order ID: #<%= orderId %></h2>
+                <% items.forEach(function(item) { %>
+                <div class="order-row">
+                    <span><%= item.name %> x <%= item.quantity %></span>
+                    <span>₦<%= item.price.toLocaleString() %></span>
+                </div>
+                <% }) %>
+                <div class="order-row">
+                    <span>Total</span>
+                    <span>₦<%= totalAmount.toLocaleString() %></span>
+                </div>
+            </div>
+
+            <div class="customer-box">
+                <h2>Customer Details</h2>
+                <p>Name: <%= customerName %></p>
+                <p>Email: <%= customerEmail %></p>
+            </div>
+
+            <p>Please log in to your vendor dashboard to manage and process this order.</p>
+            <p>Best regards,<br>The Nana's Pourfection Hub Team</p>
+        </div>
+          <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Nana's Pourfection Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

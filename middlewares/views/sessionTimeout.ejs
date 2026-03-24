@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 20px; text-align: center; }
+        .content { padding: 20px; background-color: rgb(252, 137, 233); color: rgb(1, 1, 109); }
+        .notice-box { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 15px 20px; border-radius: 8px; margin: 16px 0; text-align: center; }
+        .notice-box h2 { margin: 0; font-size: 18px; }
+        .notice-box p { margin: 6px 0 0; font-size: 13px; opacity: 0.8; }
+        .footer { background-color: rgb(1, 1, 109); color: rgb(250, 94, 224); padding: 10px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Session Expired</h1>
+            <p>Hello, <%= firstName %>!</p>
+        </div>
+        <div class="content">
+            <p>Your session on Nana's Pourfection Hub has expired and you have been automatically logged out for your security.</p>
+
+            <div class="notice-box">
+                <h2><%= email %></h2>
+                <p>⏱ Session Expired — You have been logged out</p>
+            </div>
+
+            <p>Sessions expire after a period of inactivity to keep your account safe, especially on shared devices.</p>
+            <p>If you did not expect this or believe your account has been compromised, please contact our support team immediately. Otherwise, simply log back in to continue.</p>
+            <p>Best regards,<br>The Nana's Pourfection Hub Team</p>
+        </div>
+        <div class="footer">
+            <p>&copy; <%= new Date().getFullYear() %> Nana's Pourfection Hub. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
