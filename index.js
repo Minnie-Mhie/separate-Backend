@@ -41,7 +41,7 @@ mongoose.connect(process.env.DATABASE_URI)
   
 })
 
-app.get("/api/hello", (req, res)=>{
+app.get("/", (req, res)=>{
   res.send("Hello from backend");
 });
 
