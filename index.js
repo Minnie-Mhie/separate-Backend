@@ -7,7 +7,13 @@ dotenv.config()
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: "50mb" }))
-app.use(cors())
+
+
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}))
 
 const UserRouter    = require("./routers/user.routes")
 const ProductRouter = require("./routers/product.routes")
