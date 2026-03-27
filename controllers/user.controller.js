@@ -380,8 +380,9 @@ const requestOTP = async (req, res) => {
         console.log('Email sent: ' + info.response);
       }
     });
-
+console.log("email sent"),
     res.status(200).send({
+      
       message: "Otp sent successfully",
     });
 
