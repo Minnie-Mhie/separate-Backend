@@ -26,7 +26,7 @@ const sendMessage = async (req, res) => {
 
     let mailOptions = {
       from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: process.env.NODE_MAIL_US,
+      to: process.env.NODE_MAIL,
       subject: `New Contact Message from ${name}`,
       replyTo: email,
       html: renderMail,
