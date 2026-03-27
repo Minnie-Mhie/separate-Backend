@@ -91,4 +91,5 @@ mongoose.connect(process.env.DATABASE_URI)
   .then(() => console.log("Database connected successfully"))
   .catch(() => console.log("Failed to connect to DB"))
 
+
 module.exports = app
