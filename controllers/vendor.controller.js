@@ -1,5 +1,5 @@
-const VendorModel = require("../models/vendor.model")
-const UserModel = require("../models/user.model")
+const VendorModel = require("../models/vendor.model");
+const UserModel = require("../models/user.model");
 const nodemailer = require("nodemailer");
 const mailSender = require("../middlewares/mailer");
 
@@ -12,216 +12,121 @@ let transporter = nodemailer.createTransport({
 });
 
 const applyAsVendor = async (req, res) => {
-  const { storeName, storeDescription } = req.body
+  const { storeName, storeDescription } = req.body;
 
   try {
-    const existingApplication = await VendorModel.findOne({ owner: req.user.id })
+    const existingApplication = await VendorModel.findOne({ owner: req.user.id });
     if (existingApplication) {
-      res.status(400).send({
-        message: "You have already submitted a vendor application",
-      })
-      return
+      return res.status(400).send({ message: "You have already submitted a vendor application" });
     }
-
     const vendor = await VendorModel.create({
       storeName,
       storeDescription,
       owner: req.user.id,
-    })
+    });
 
-    await UserModel.findByIdAndUpdate(req.user.id, {
-      roles: "vendor",
-      status: "pending",
-    })
+    const user = await UserModel.findByIdAndUpdate(
+      req.user.id, 
+      { roles: "vendor", status: "pending" }, 
+      { new: true }
+    );
 
     res.status(201).send({
-      message: "Vendor application submitted successfully. Await admin approval.",
+      message: "Application submitted. Awaiting admin approval.",
       data: vendor,
-    })
+    });
 
-    const isUser = await UserModel.findById(req.user.id)
-    const email = isUser.email
-    const renderMail = await mailSender("pendingVendor.ejs", {
-      firstName: isUser.firstName,
-      storeName: vendor.storeName,
-    })
-
-    let mailOptions = {
+    const vendorMail = await mailSender("pendingVendor.ejs", { firstName: user.firstName, storeName: vendor.storeName });
+  
+    transporter.sendMail({
       from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: email,
-      subject: `Application Received, ${isUser.firstName}!`,
-      html: renderMail,
-    }
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    })
+      to: user.email,
+      subject: "Application Received!",
+      html: vendorMail,
+    });
+    transporter.sendMail({
+      from: `"System Alert" <${process.env.NODE_MAIL}>`,
+      to: process.env.ADMIN_EMAIL, 
+      subject: "New Vendor Alert",
+      text: `New vendor application from ${user.firstName} for store: ${vendor.storeName}.`,
+    });
 
   } catch (error) {
-    console.log(error)
-
-    if (error.code == 11000) {
-      res.status(400).send({
-        message: "A vendor with that store name already exists",
-      })
-    } else {
-      res.status(400).send({
-        message: "Vendor application failed",
-      })
-    }
+    console.error(error);
+    const msg = error.code === 11000 ? "Store name already exists" : "Application failed";
+    res.status(400).send({ message: msg });
   }
-}
+};
 
 const approveVendor = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
 
   try {
-    const vendor = await VendorModel.findById(id)
-    if (!vendor) {
-      res.status(404).send({
-        message: "Vendor application not found",
-      })
-      return
-    }
+    const vendor = await VendorModel.findById(id);
+    if (!vendor) return res.status(404).send({ message: "Application not found" });
 
-    await VendorModel.findByIdAndUpdate(id, { status: "approved" })
-    await UserModel.findByIdAndUpdate(vendor.owner, { status: "active" })
+    await VendorModel.findByIdAndUpdate(id, { status: "approved" });
+    const user = await UserModel.findByIdAndUpdate(vendor.owner, { status: "active" }, { new: true });
 
-    res.status(200).send({
-      message: "Vendor approved successfully",
-    })
+    res.status(200).send({ message: "Vendor approved successfully" });
 
-    const isUser = await UserModel.findById(vendor.owner)
-    const email = isUser.email
-    const renderMail = await mailSender("approveVendor.ejs", {
-      firstName: isUser.firstName,
-      storeName: vendor.storeName,
-    })
-
-    let mailOptions = {
+    const approveMail = await mailSender("approveVendor.ejs", { firstName: user.firstName, storeName: vendor.storeName });
+    transporter.sendMail({
       from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: email,
-      subject: `Application Update, ${isUser.firstName}`,
-      html: renderMail,
-    }
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    })
+      to: user.email,
+      subject: "Congratulations! Your Store is Live",
+      html: approveMail,
+    });
 
   } catch (error) {
-    console.log(error)
-    res.status(400).send({
-      message: "Failed to approve vendor",
-    })
+    res.status(400).send({ message: "Approval failed" });
   }
-}
+};
 
 const rejectVendor = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
 
   try {
-    const vendor = await VendorModel.findById(id)
-    if (!vendor) {
-      res.status(404).send({
-        message: "Vendor application not found",
-      })
-      return
-    }
+    const vendor = await VendorModel.findById(id);
+    if (!vendor) return res.status(404).send({ message: "Application not found" });
 
-    await VendorModel.findByIdAndUpdate(id, { status: "rejected" })
-    await UserModel.findByIdAndUpdate(vendor.owner, {
-      roles: "user",
-      status: "active",
-    })
+    await VendorModel.findByIdAndUpdate(id, { status: "rejected" });
+    const user = await UserModel.findByIdAndUpdate(vendor.owner, { roles: "user", status: "active" }, { new: true });
 
-    res.status(200).send({
-      message: "Vendor application rejected",
-    })
+    res.status(200).send({ message: "Vendor application rejected" });
 
-    const isUser = await UserModel.findById(vendor.owner)
-    const email = isUser.email
-    const renderMail = await mailSender("rejectVendor.ejs", {
-      firstName: isUser.firstName,
-      storeName: vendor.storeName,
-    })
-
-    let mailOptions = {
+    const rejectMail = await mailSender("rejectVendor.ejs", { firstName: user.firstName, storeName: vendor.storeName });
+    transporter.sendMail({
       from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: email,
-      subject: `Application Update, ${isUser.firstName}`,
-      html: renderMail,
-    }
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    })
+      to: user.email,
+      subject: "Application Update",
+      html: rejectMail,
+    });
 
   } catch (error) {
-    console.log(error)
-    res.status(400).send({
-      message: "Failed to reject vendor",
-    })
+    res.status(400).send({ message: "Rejection failed" });
   }
-}
+};
 
 const getAllVendors = async (req, res) => {
   try {
-    const vendors = await VendorModel.find().populate("owner", "firstName lastName email status")
-    res.status(200).send({
-      message: "Vendors retrieved successfully",
-      data: vendors,
-    })
+    const { status } = req.query;
+    const filter = status ? { status } : {};
+    const vendors = await VendorModel.find(filter).populate("owner", "firstName lastName email status");
+    res.status(200).send({ data: vendors });
   } catch (error) {
-    console.log(error)
-    res.status(404).send({
-      message: "Failed to retrieve vendors",
-    })
+    res.status(404).send({ message: "Failed to retrieve vendors" });
   }
-}
+};
 
 const getMyStore = async (req, res) => {
   try {
-    const vendor = await VendorModel.findOne({ owner: req.user.id }).populate(
-      "owner",
-      "firstName lastName email"
-    )
-
-    if (!vendor) {
-      res.status(404).send({
-        message: "You do not have a vendor profile",
-      })
-      return
-    }
-
-    res.status(200).send({
-      message: "Store retrieved successfully",
-      data: vendor,
-    })
+    const vendor = await VendorModel.findOne({ owner: req.user.id }).populate("owner", "firstName lastName email");
+    if (!vendor) return res.status(404).send({ message: "No vendor profile found" });
+    res.status(200).send({ data: vendor });
   } catch (error) {
-    console.log(error)
-    res.status(404).send({
-      message: "Failed to retrieve store",
-    })
+    res.status(404).send({ message: "Error retrieving store" });
   }
-}
+};
 
-module.exports = {
-  applyAsVendor,
-  approveVendor,
-  rejectVendor,
-  getAllVendors,
-  getMyStore,
-}
+module.exports = { applyAsVendor, approveVendor, rejectVendor, getAllVendors, getMyStore };
