@@ -12,7 +12,9 @@ let transporter = nodemailer.createTransport({
     user: process.env.NODE_MAIL,
     pass: process.env.NODE_PASS
   }
+  
 });
+
 
 const dns = require("dns").promises
 const isRealEmail = async (email) => {
@@ -346,53 +348,48 @@ const requestOTP = async (req, res) => {
       });
     }
 
-    const sendOTP = otpgen.generate(4, {
-      upperCaseAlphabets: false,
-      specialChars: false,
-      lowerCaseAlphabets: false,
-      digits: true
-    });
+   const sendOTP = otpgen.generate(4, {
+  upperCaseAlphabets: false,
+  specialChars: false,
+  lowerCaseAlphabets: false,
+  digits: true
+});
 
-    console.log("OTP:", sendOTP);
+console.log("OTP:", sendOTP);
 
-    await OTPModel.create({ email, otp: sendOTP });
+await OTPModel.create({ email, otp: sendOTP });
 
-    console.log("OTP saved");
+console.log("OTP saved");
 
-    const otpMailContent = await mailSender('otpMail.ejs', {
-      otp: sendOTP,
-      firstName: isUser.firstName
-    });
+const otpMailContent = await mailSender('otpMail.ejs', {
+  otp: sendOTP,
+  firstName: isUser.firstName
+});
 
-    console.log("Mail content ready");
+console.log("Mail content ready");
 
-    let mailOptions = {
-      from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: email,
-      subject: `OTP CODE`,
-      html: otpMailContent
-    };
+let mailOptions = {
+  from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
+  to: email,
+  subject: `OTP CODE`,
+  html: otpMailContent
+};
 
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log("MAIL ERROR:", error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
-console.log("email sent"),
-    res.status(200).send({
-      
-      message: "Otp sent successfully",
-    });
+await transporter.sendMail(mailOptions);
 
-  } catch (error) {
-    console.log("OTP ERROR:", error);
-    res.status(400).send({
-      message: "Otp request failed",
-      error: error.message
-    });
-  }
+console.log("Email sent");
+
+return res.status(200).send({
+  message: "Otp sent successfully",
+});
+
+} catch (error) {
+  console.log("OTP ERROR:", error);
+  return res.status(400).send({
+    message: "Otp request failed",
+    error: error.message
+  });
+}
 };
 
 const forgotPassword = async (req, res) => {
