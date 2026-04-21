@@ -4,21 +4,24 @@ const OrderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
   items: [
     {
-      product: { type: mongoose.Schema.Types.ObjectId, ref: "product", required: true },
-      quantity: { type: Number, required: true },
-      priceAtOrder: { type: Number, required: true },
+      product:            { type: mongoose.Schema.Types.ObjectId, ref: "product", required: true },
+      quantity:           { type: Number, required: true },
+      priceAtOrder:       { type: Number, required: true },
+      vendorEarnings:     { type: Number, required: true },
+      platformCommission: { type: Number, required: true },
     },
   ],
-  totalAmount: { type: Number, required: true },
+  totalAmount:        { type: Number, required: true },
+  paystackReference:  { type: String, default: "" },
   status: {
     type: String,
     enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
     default: "pending",
   },
   shippingAddress: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
+    street:  { type: String, required: true },
+    city:    { type: String, required: true },
+    state:   { type: String, required: true },
     country: { type: String, required: true },
   },
 }, { timestamps: true, strict: "throw" })

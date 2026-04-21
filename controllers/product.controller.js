@@ -20,7 +20,7 @@ let transporter = nodemailer.createTransport({
 });
 
 const listProduct = async (req, res) => {
-  const { productName, productPrice, productQuantity, productDescription, productImage, category, videoUrl } = req.body
+  const { productName, productPrice: vendorPrice, productQuantity, productDescription, productImage, category, videoUrl } = req.body
 
   try {
     const vendorProfile = await VendorModel.findOne({ owner: req.user.id })
@@ -37,9 +37,13 @@ const listProduct = async (req, res) => {
     }
 
     if (!vendorProfile) {
-      res.status(403).send({ message: "Admin vendor profile not found. Please create a vendor profile for Nana's Pourfection Hub first." })
+      res.status(403).send({ message: "Admin vendor profile not found." })
       return
     }
+
+    const settings = await PlatformSettingsModel.findOne()
+    const commissionRate = settings ? settings.commissionRate : 0
+    const productPrice = parseFloat((vendorPrice * (1 + commissionRate / 100)).toFixed(2))
 
     const result = await cloudinary.uploader.upload(productImage)
     const image = {
@@ -50,6 +54,8 @@ const listProduct = async (req, res) => {
     const product = await ProductModel.create({
       productName,
       productPrice,
+      vendorPrice,
+      commissionRate,
       productQuantity,
       productDescription,
       productImage: image,

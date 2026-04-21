@@ -22,6 +22,10 @@ const CartRouter    = require("./routers/cart.routes")
 const OrderRouter   = require("./routers/order.routes")
 const KycRouter     = require("./routers/kyc.routes")
 const ContactRouter = require("./routers/contact.routes")
+const paymentRoute = require("./routes/payment.route")
+const platformSettingsRoute = require("./routes/platformSettings.route")
+
+
 
 app.get("/", (req, res) => {
   res.send("Nana's Pourfection Hub API is running")
@@ -34,6 +38,8 @@ app.use("/api/v1", CartRouter)
 app.use("/api/v1", OrderRouter)
 app.use("/api/v1", KycRouter)
 app.use("/api/v1", ContactRouter)
+app.use("/api/v1/payment", paymentRoute)
+app.use("/api/v1/settings", platformSettingsRoute)
 
 app.use((req, res) => {
   res.status(404).json({
