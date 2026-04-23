@@ -22,8 +22,8 @@ const CartRouter    = require("./routers/cart.routes")
 const OrderRouter   = require("./routers/order.routes")
 const KycRouter     = require("./routers/kyc.routes")
 const ContactRouter = require("./routers/contact.routes")
-const paymentRoute = require("./routes/payment.route")
-const platformSettingsRoute = require("./routes/platformSettings.route")
+const paymentRoute = require("./routers/payment.routes")
+const platformSettingsRoute = require("./routers/platformSettings.routes")
 
 
 
