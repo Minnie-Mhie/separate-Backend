@@ -1,23 +1,36 @@
 const ProductModel = require("../models/product.model")
-const VendorModel = require("../models/vendor.model")
-const UserModel = require("../models/user.model")
-const cloudinary = require("cloudinary").v2
-const nodemailer = require("nodemailer");
-const mailSender = require("../middlewares/mailer");
+const VendorModel  = require("../models/vendor.model")
+const UserModel    = require("../models/user.model")
+const cloudinary   = require("cloudinary").v2
+const nodemailer   = require("nodemailer")
+const mailSender   = require("../middlewares/mailer")
+const COMMISSION_RATE = 0.10;
 
 cloudinary.config({
-  api_key: process.env.CLOUD_KEY,
+  api_key:    process.env.CLOUD_KEY,
   cloud_name: process.env.CLOUD_NAME,
   api_secret: process.env.CLOUD_SECRET,
-});
+})
 
 let transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host:   "smtp.gmail.com",
+  port:   465,
+  secure: true,
   auth: {
     user: process.env.NODE_MAIL,
-    pass: process.env.NODE_PASS
-  }
-});
+    pass: process.env.NODE_PASS,
+  },
+})
+
+const sendMail = (mailOptions) => {
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error)
+    } else {
+      console.log("Email sent: " + info.response)
+    }
+  })
+}
 
 const listProduct = async (req, res) => {
   const { productName, productPrice, productQuantity, productDescription, productImage, category, videoUrl } = req.body
@@ -43,7 +56,7 @@ const listProduct = async (req, res) => {
 
     const result = await cloudinary.uploader.upload(productImage)
     const image = {
-      public_id: result.public_id,
+      public_id:  result.public_id,
       secure_url: result.secure_url,
     }
 
@@ -54,10 +67,10 @@ const listProduct = async (req, res) => {
       productDescription,
       productImage: image,
       category,
-      videoUrl: videoUrl || "",
+      videoUrl:  videoUrl || "",
       createdBy: req.user.id,
-      vendor: vendorProfile._id,
-      status: req.user.roles === "admin" ? "approved" : "pending",
+      vendor:    vendorProfile._id,
+      status:    req.user.roles === "admin" ? "approved" : "pending",
     })
 
     res.status(201).send({
@@ -80,44 +93,30 @@ const approveProduct = async (req, res) => {
     const product = await ProductModel.findById(id)
 
     if (!product) {
-      res.status(404).send({
-        message: "Product not found",
-      })
+      res.status(404).send({ message: "Product not found" })
       return
     }
 
     await ProductModel.findByIdAndUpdate(id, { status: "approved" })
 
-    res.status(200).send({
-      message: "Product approved successfully",
-    })
+    res.status(200).send({ message: "Product approved successfully" })
+
     const isUser = await UserModel.findById(product.createdBy)
-    const email = isUser.email
     const renderMail = await mailSender("approveProduct.ejs", {
-      firstName: isUser.firstName,
+      firstName:   isUser.firstName,
       productName: product.productName,
     })
 
-    let mailOptions = {
-      from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: email,
+    sendMail({
+      from:    `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
+      to:      isUser.email,
       subject: `Product Approved, ${isUser.firstName}!`,
-      html: renderMail,
-    }
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
+      html:    renderMail,
     })
 
   } catch (error) {
     console.log(error)
-    res.status(400).send({
-      message: "Failed to approve product",
-    })
+    res.status(400).send({ message: "Failed to approve product" })
   }
 }
 
@@ -128,62 +127,68 @@ const rejectProduct = async (req, res) => {
     const product = await ProductModel.findById(id)
 
     if (!product) {
-      res.status(404).send({
-        message: "Product not found",
-      })
+      res.status(404).send({ message: "Product not found" })
       return
     }
 
     await ProductModel.findByIdAndUpdate(id, { status: "rejected" })
 
-    res.status(200).send({
-      message: "Product Rejected",
-    })
+    res.status(200).send({ message: "Product rejected" })
+
     const isUser = await UserModel.findById(product.createdBy)
-    const email = isUser.email
     const renderMail = await mailSender("rejectProduct.ejs", {
-      firstName: isUser.firstName,
+      firstName:   isUser.firstName,
       productName: product.productName,
     })
 
-    let mailOptions = {
-      from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: email,
-      subject: `Product Rejected, ${isUser.firstName}!`,
-      html: renderMail,
-    }
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
+    sendMail({
+      from:    `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
+      to:      isUser.email,
+      subject: `Product Update, ${isUser.firstName}`,
+      html:    renderMail,
     })
 
   } catch (error) {
     console.log(error)
-    res.status(400).send({
-      message: "Failed to reject product",
-    })
+    res.status(400).send({ message: "Failed to reject product" })
   }
+}
+
+const isVendorActive = (product) => {
+  const vendor     = product.vendor
+  const vendorUser = vendor?.owner
+
+  if (!vendor) return false
+  if (vendor.status !== "approved") return false
+  if (!vendorUser) return true
+  if (vendorUser.status === "suspended") return false
+  if (vendorUser.status === "deleted")   return false
+
+  return true
 }
 
 const getProducts = async (req, res) => {
   try {
-    const products = await ProductModel.find({ status: "approved" })
+    const allApproved = await ProductModel.find({ status: "approved" })
       .populate("createdBy", "firstName lastName email")
-      .populate("vendor", "storeName")
+      .populate({
+        path:   "vendor",
+        select: "storeName status owner",
+        populate: {
+          path:   "owner",
+          select: "status",
+        },
+      })
+
+    const activeProducts = allApproved.filter(isVendorActive)
 
     res.status(200).send({
       message: "Products fetched successfully",
-      data: products,
+      data:    activeProducts,
     })
   } catch (error) {
     console.log(error)
-    res.status(404).send({
-      message: "Failed to fetch products",
-    })
+    res.status(404).send({ message: "Failed to fetch products" })
   }
 }
 
@@ -195,13 +200,11 @@ const getAllProducts = async (req, res) => {
 
     res.status(200).send({
       message: "All products fetched successfully",
-      data: products,
+      data:    products,
     })
   } catch (error) {
     console.log(error)
-    res.status(404).send({
-      message: "Failed to fetch products",
-    })
+    res.status(404).send({ message: "Failed to fetch products" })
   }
 }
 
@@ -210,9 +213,7 @@ const getMyProducts = async (req, res) => {
     const vendorProfile = await VendorModel.findOne({ owner: req.user.id })
 
     if (!vendorProfile) {
-      res.status(404).send({
-        message: "Vendor profile not found",
-      })
+      res.status(404).send({ message: "Vendor profile not found" })
       return
     }
 
@@ -221,33 +222,25 @@ const getMyProducts = async (req, res) => {
 
     res.status(200).send({
       message: "Your products fetched successfully",
-      data: products,
+      data:    products,
     })
   } catch (error) {
     console.log(error)
-    res.status(404).send({
-      message: "Failed to fetch your products",
-    })
+    res.status(404).send({ message: "Failed to fetch your products" })
   }
 }
 
 const getProductsBy = async (req, res) => {
   const { productName, productPrice, createdBy } = req.query
-  const page = parseInt(req.query.page) || 1
+  const page  = parseInt(req.query.page)  || 1
   const limit = parseInt(req.query.limit) || 10
-  const skip = (page - 1) * limit
+  const skip  = (page - 1) * limit
 
   try {
     const filter = {}
-
-    if (productName)
-      filter.productName = { $regex: productName, $options: "i" }
-
-    if (productPrice)
-      filter.productPrice = productPrice
-
-    if (createdBy)
-      filter.createdBy = createdBy
+    if (productName)  filter.productName  = { $regex: productName, $options: "i" }
+    if (productPrice) filter.productPrice = productPrice
+    if (createdBy)    filter.createdBy    = createdBy
 
     const product = await ProductModel.find(filter)
       .populate("createdBy", "firstName lastName email")
@@ -261,15 +254,13 @@ const getProductsBy = async (req, res) => {
       data: product,
       meta: {
         currentPage: page,
-        totalPages: Math.ceil(total / limit),
-        total
-      }
+        totalPages:  Math.ceil(total / limit),
+        total,
+      },
     })
   } catch (error) {
     console.log(error)
-    res.status(404).send({
-      message: "failed to fetch product"
-    })
+    res.status(404).send({ message: "Failed to fetch products" })
   }
 }
 
@@ -279,13 +270,11 @@ const getCategories = async (req, res) => {
 
     res.status(200).send({
       message: "Categories fetched successfully",
-      data: categories,
+      data:    categories,
     })
   } catch (error) {
     console.log(error)
-    res.status(404).send({
-      message: "Failed to fetch categories",
-    })
+    res.status(404).send({ message: "Failed to fetch categories" })
   }
 }
 
@@ -293,24 +282,31 @@ const getProductsByCategory = async (req, res) => {
   const { category } = req.params
 
   try {
-    const products = await ProductModel.find({
-      status: "approved",
+    const allProducts = await ProductModel.find({
+      status:   "approved",
       category: { $regex: category, $options: "i" },
     })
       .populate("createdBy", "firstName lastName email")
-      .populate("vendor", "storeName")
+      .populate({
+        path:   "vendor",
+        select: "storeName status owner",
+        populate: {
+          path:   "owner",
+          select: "status",
+        },
+      })
       .sort({ createdAt: -1 })
+
+    const activeProducts = allProducts.filter(isVendorActive)
 
     res.status(200).send({
       message: `Products in ${category} fetched successfully`,
-      total: products.length,
-      data: products,
+      total:   activeProducts.length,
+      data:    activeProducts,
     })
   } catch (error) {
     console.log(error)
-    res.status(404).send({
-      message: "Failed to fetch products by category",
-    })
+    res.status(404).send({ message: "Failed to fetch products by category" })
   }
 }
 
@@ -336,7 +332,7 @@ const editProduct = async (req, res) => {
     if (productImage && productImage !== product.productImage.secure_url) {
       const result = await cloudinary.uploader.upload(productImage)
       updatedImage = {
-        public_id: result.public_id,
+        public_id:  result.public_id,
         secure_url: result.secure_url,
       }
     }
@@ -347,58 +343,26 @@ const editProduct = async (req, res) => {
       productQuantity,
       productDescription,
       category,
-      videoUrl: videoUrl || "",
+      videoUrl:     videoUrl || "",
       productImage: updatedImage,
-      status: "pending",
+      status:       "pending",
     })
 
     res.status(200).send({ message: "Product updated successfully. Awaiting admin approval." })
 
     const isUser = await UserModel.findById(product.createdBy)
-    const email = isUser.email
     const renderMail = await mailSender("pendingProduct.ejs", {
-      firstName: isUser.firstName,
+      firstName:   isUser.firstName,
       productName: product.productName,
     })
 
-    let mailOptions = {
-      from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-      to: email,
-      subject: `Product Listing Received, ${isUser.firstName}!`,
-      html: renderMail,
-    }
-
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
+    sendMail({
+      from:    `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
+      to:      isUser.email,
+      subject: `Product Update Received, ${isUser.firstName}!`,
+      html:    renderMail,
     })
 
-    if (product.status === "approved") {
-      const isUser = await UserModel.findById(product.createdBy)
-      const email = isUser.email
-      const renderMail = await mailSender("approveProduct.ejs", {
-        firstName: isUser.firstName,
-        productName: product.productName,
-      })
-
-      let mailOptions = {
-        from: `"Nana's Pourfection Hub" <${process.env.NODE_MAIL}>`,
-        to: email,
-        subject: `Product Approved, ${isUser.firstName}!`,
-        html: renderMail,
-      }
-
-      transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      })
-    }
   } catch (error) {
     console.log(error)
     res.status(400).send({ message: "Failed to update product" })
